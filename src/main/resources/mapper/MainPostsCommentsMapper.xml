@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xiazhuoxian.bbs.mapper.MainPostsCommentsMapper" >
+
+    <resultMap id="MainPostsComments" type="com.xiazhuoxian.bbs.pojo.MainPostsComments">
+        <id column="main_posts_comments_id" property="mainPostsCommentsId"/>
+        <result column="poster_identity" property="posterIdentity"/>
+        <result column="parent_comment_id" property="parentCommentId"/>
+        <result column="parent_comment_poster_nickname" property="parentCommentPosterNickname"/>
+        <result column="head_comment_id" property="headCommentId"/>
+        <result column="number_of_comment" property="numberOfComment"/>
+        <result column="number_of_liked" property="numberOfLiked"/>
+        <result column="content" property="content"/>
+        <result column="update_time" property="updateTime"/>
+        <association property="mainPosts" javaType="com.xiazhuoxian.bbs.pojo.MainPosts">
+            <id property="mainPostsId" column="main_posts_id"/>
+            <result property="title" column="title"/>
+        </association>
+        <association property="plateClassification" javaType="com.xiazhuoxian.bbs.pojo.PlateClassification">
+            <id property="plateId" column="plate_id"/>
+            <result property="plateName" column="plate_name"/>
+        </association>
+        <association property="unionClassification" javaType="com.xiazhuoxian.bbs.pojo.UnionClassification">
+            <id property="unionId" column="union_id"/>
+            <result property="unionName" column="union_name"/>
+        </association>
+        <association property="communityClassification" javaType="com.xiazhuoxian.bbs.pojo.CommunityClassification">
+            <id property="communityId" column="community_id"/>
+            <result property="communityName" column="community_name"/>
+        </association>
+        <association property="adminInfo" javaType="com.xiazhuoxian.bbs.pojo.AdminInfo">
+            <id column="aai" property="adminId"/>
+            <result column="aln" property="loginName"/>
+            <result column="an" property="nickname"/>
+            <result column="aicon" property="icon"/>
+            <result column="ai" property="identity"/>
+        </association>
+        <association property="userInfo" javaType="com.xiazhuoxian.bbs.pojo.UserInfo">
+            <id column="uui" property="userId"/>
+            <result column="uln" property="loginName"/>
+            <result column="un" property="nickname"/>
+            <result column="uicon" property="icon"/>
+            <result column="ust" property="status"/>
+            <result column="ui" property="identity"/>
+        </association>
+    </resultMap>
+
+    <select id="mainPostsCommentsPagingSelect" resultMap="MainPostsComments">
+        <bind name="firstItem" value="(paging.currentPageNumber-1)*paging.itemsDisplayedPerPage"></bind>
+        select m.main_posts_comments_id,m.poster_identity,m.parent_comment_id,m.parent_comment_poster_nickname,m.head_comment_id,m.number_of_comment,m.number_of_liked,m.content,m.update_time,
+        mp.main_posts_id,mp.title,
+        p.plate_id,p.plate_name,u.union_id,u.union_name,c.community_id,c.community_name,
+        a.admin_id aai,a.login_name aln,a.nickname an,a.icon aicon,a.identity ai,
+        us.user_id uui,us.login_name uln,us.nickname un,us.icon uicon,us.identity ui,us.status ust
+        from (main_posts_comments m,main_posts mp,plate_classification p,union_classification u,community_classification c)
+        left join admin_info a on m.poster_identity=a.identity and m.poster_id=a.admin_id
+        left join user_info us on m.poster_identity=us.identity and m.poster_id=us.user_id
+        where
+        m.mainposts_id=mp.main_posts_id and
+        <if test="mainPostsComments.mainPosts!=null">
+            m.mainposts_id=#{mainPostsComments.mainPosts.mainPostsId} and
+        </if>
+        <if test="mainPostsComments.headCommentId!=null">
+            m.head_comment_id=#{mainPostsComments.headCommentId} and
+        </if>
+        m.plate_classification_id=p.plate_id and m.union_classification_id=u.union_id and m.community_classification_id=c.community_id
+        <if test="mainPostsComments.posterIdentity!=null and mainPostsComments.posterIdentity.toString()!='' and mainPostsComments.adminInfo!=null">
+            and m.poster_identity=#{mainPostsComments.posterIdentity}
+            and m.poster_id=#{mainPostsComments.adminInfo.adminId}
+        </if>
+        <if test="mainPostsComments.posterIdentity!=null and mainPostsComments.posterIdentity.toString()!='' and mainPostsComments.userInfo!=null">
+            and m.poster_identity=#{mainPostsComments.posterIdentity}
+            and m.poster_id=#{mainPostsComments.userInfo.userId}
+        </if>
+        <if test="paging.selectCondition!=null and paging.selectCondition!=''">
+            and m.title like CONCAT('%',#{paging.selectCondition},'%')
+        </if>
+        <if test="mainPostsComments.plateClassification!=null">
+            and m.plate_classification_id=#{mainPostsComments.plateClassification.plateId}
+        </if>
+        <if test="mainPostsComments.unionClassification!=null">
+            and m.union_classification_id=#{mainPostsComments.unionClassification.unionId}
+        </if>
+        <if test="mainPostsComments.communityClassification!=null">
+            and m.community_classification_id=#{mainPostsComments.communityClassification.communityId}
+        </if>
+        order by m.main_posts_comments_id
+        limit #{firstItem},#{paging.itemsDisplayedPerPage}
+    </select>
+
+    <insert id="insertMainPostsComments" parameterType="com.xiazhuoxian.bbs.pojo.MainPostsComments" useGeneratedKeys="true" keyProperty="mainPostsCommentsId">
+        insert into main_posts_comments
+        (plate_classification_id,union_classification_id,community_classification_id,poster_identity,poster_id,mainposts_id,parent_comment_id,parent_comment_poster_nickname,head_comment_id,number_of_comment,number_of_liked,content,update_time)
+        values (
+        #{plateClassification.plateId},#{unionClassification.unionId},#{communityClassification.communityId},#{posterIdentity},
+        <if test="posterIdentity.toString()=='ADMIN'">
+            #{adminInfo.adminId},
+        </if>
+        <if test="posterIdentity.toString()=='USER'">
+            #{userInfo.userId},
+        </if>
+        #{mainPosts.mainPostsId},#{parentCommentId},#{parentCommentPosterNickname},#{headCommentId},#{numberOfComment},#{numberOfLiked},#{content},#{updateTime}
+        );
+    </insert>
+
+    <delete id="deleteMainPostsCommentsById" parameterType="int">
+        delete from main_posts_comments where main_posts_comments_id=#{mainPostsCommentsId}
+    </delete>
+
+    <update id="updateMainPostsComments" parameterType="com.xiazhuoxian.bbs.pojo.MainPostsComments">
+        update main_posts_comments set content=#{content},update_time=#{updateTime}
+        where main_posts_comments_id=#{mainPostsCommentsId}
+    </update>
+
+    <select id="selectMainPostsCommentsById" parameterType="int" resultMap="MainPostsComments">
+        select m.main_posts_comments_id,m.poster_identity,m.parent_comment_id,m.parent_comment_poster_nickname,m.head_comment_id,m.number_of_comment,m.number_of_liked,m.content,m.update_time,
+        mp.main_posts_id,mp.title
+        p.plate_id,p.plate_name,u.union_id,u.union_name,c.community_id,c.community_name,
+        a.admin_id aai,a.login_name aln,a.nickname an,a.icon aicon,a.identity ai,
+        us.user_id uui,us.login_name uln,us.nickname un,us.icon uicon,us.identity ui,us.status ust
+        from main_posts_comments m,main_posts mp,plate_classification p,union_classification u,community_classification c,admin_info a,user_info us
+        where
+        m.plate_classification_id=p.plate_id and m.union_classification_id=u.union_id and m.community_classification_id=c.community_id
+        and ((m.poster_identity=a.identity and m.poster_id=a.admin_id)
+        or (m.poster_identity=us.identity and m.poster_id=us.user_id))
+        and m.main_posts_comments_id=#{mainPostsCommentsId}
+    </select>
+    
+    <update id="addTheNumberOfComment" parameterType="int">
+        update main_posts_comments set number_of_comment=number_of_comment+1 where main_posts_comments_id=#{mainPostsCommentsId}
+    </update>
+</mapper>

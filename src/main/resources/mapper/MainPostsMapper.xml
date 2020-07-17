@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xiazhuoxian.bbs.mapper.MainPostsMapper" >
+
+    <resultMap id="MainPosts" type="com.xiazhuoxian.bbs.pojo.MainPosts">
+        <id column="main_posts_id" property="mainPostsId"/>
+        <result column="status" property="status"/>
+        <result column="title" property="title"/>
+        <result column="content" property="content"/>
+        <result column="poster_identity" property="posterIdentity"/>
+        <result column="number_of_collected" property="numberOfCollected"/>
+        <result column="number_of_recommended" property="numberOfRecommended"/>
+        <result column="number_of_read" property="numberOfRead"/>
+        <result column="number_of_commented" property="numberOfCommented"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <association property="plateClassification" javaType="com.xiazhuoxian.bbs.pojo.PlateClassification">
+            <id property="plateId" column="plate_id"/>
+            <result property="plateName" column="plate_name"/>
+        </association>
+        <association property="unionClassification" javaType="com.xiazhuoxian.bbs.pojo.UnionClassification">
+            <id property="unionId" column="union_id"/>
+            <result property="unionName" column="union_name"/>
+        </association>
+        <association property="communityClassification" javaType="com.xiazhuoxian.bbs.pojo.CommunityClassification">
+            <id property="communityId" column="community_id"/>
+            <result property="communityName" column="community_name"/>
+        </association>
+        <association property="adminInfo" javaType="com.xiazhuoxian.bbs.pojo.AdminInfo">
+            <id column="aai" property="adminId"/>
+            <result column="aln" property="loginName"/>
+            <result column="an" property="nickname"/>
+            <result column="aicon" property="icon"/>
+            <result column="ai" property="identity"/>
+        </association>
+        <association property="userInfo" javaType="com.xiazhuoxian.bbs.pojo.UserInfo">
+            <id column="uui" property="userId"/>
+            <result column="uln" property="loginName"/>
+            <result column="un" property="nickname"/>
+            <result column="uicon" property="icon"/>
+            <result column="ust" property="status"/>
+            <result column="ui" property="identity"/>
+        </association>
+    </resultMap>
+
+    <select id="mainPostsPagingSelect" resultMap="MainPosts">
+        <bind name="firstItem" value="(paging.currentPageNumber-1)*paging.itemsDisplayedPerPage"></bind>
+        select m.main_posts_id,m.status,m.title,m.content,m.poster_identity,m.number_of_collected,m.number_of_recommended,m.number_of_read,m.number_of_commented,m.create_time,m.update_time,
+                p.plate_id,p.plate_name,u.union_id,u.union_name,c.community_id,c.community_name,
+                a.admin_id aai,a.login_name aln,a.nickname an,a.icon aicon,a.identity ai,
+                us.user_id uui,us.login_name uln,us.nickname un,us.icon uicon,us.identity ui,us.status ust
+        from (main_posts m,plate_classification p,union_classification u,community_classification c)
+        left join admin_info a on m.poster_identity=a.identity and m.poster_id=a.admin_id
+        left join user_info us on m.poster_identity=us.identity and m.poster_id=us.user_id
+        where m.plate_classification_id=p.plate_id and m.union_classification_id=u.union_id and m.community_classification_id=c.community_id
+        <if test="paging.selectCondition!=null and paging.selectCondition!=''">
+            and m.title like CONCAT('%',#{paging.selectCondition},'%')
+        </if>
+        <if test="mainPosts.plateClassification!=null">
+            and m.plate_classification_id=#{mainPosts.plateClassification.plateId}
+        </if>
+        <if test="mainPosts.unionClassification!=null">
+            and m.union_classification_id=#{mainPosts.unionClassification.unionId}
+        </if>
+        <if test="mainPosts.communityClassification!=null">
+            and m.community_classification_id=#{mainPosts.communityClassification.communityId}
+        </if>
+        <if test="mainPosts.posterIdentity!=null and mainPosts.posterIdentity.toString()!='' and mainPosts.adminInfo!=null">
+            and m.poster_identity=#{mainPosts.posterIdentity}
+            and m.poster_id=#{mainPosts.adminInfo.adminId}
+        </if>
+        <if test="mainPosts.posterIdentity!=null and mainPosts.posterIdentity.toString()!='' and mainPosts.userInfo!=null">
+            and m.poster_identity=#{mainPosts.posterIdentity}
+            and m.poster_id=#{mainPosts.userInfo.userId}
+        </if>
+        order by m.update_time desc
+        limit #{firstItem},#{paging.itemsDisplayedPerPage}
+    </select>
+
+    <insert id="insertMainPosts" parameterType="com.xiazhuoxian.bbs.pojo.MainPosts">
+        insert into main_posts
+        (plate_classification_id,union_classification_id,community_classification_id,status,title,content,poster_identity,poster_id,number_of_collected,number_of_recommended,number_of_read,number_of_commented,create_time,update_time)
+        values (
+        #{plateClassification.plateId},#{unionClassification.unionId},#{communityClassification.communityId},#{status},#{title},#{content},#{posterIdentity},
+        <if test="posterIdentity.toString()=='ADMIN'">
+            #{adminInfo.adminId},
+        </if>
+        <if test="posterIdentity.toString()=='USER'">
+            #{userInfo.userId},
+        </if>
+        #{numberOfCollected},#{numberOfRecommended},#{numberOfRead},#{numberOfCommented},#{createTime},#{updateTime}
+        );
+    </insert>
+
+    <delete id="deleteMainPostsById" parameterType="int">
+        delete from main_posts where main_posts_id=#{mainPostsId}
+    </delete>
+
+    <update id="updateMainPosts" parameterType="com.xiazhuoxian.bbs.pojo.MainPosts">
+        update main_posts set title=#{title},content=#{content},plate_classification_id=#{plateClassification.plateId},union_classification_id=#{unionClassification.unionId},community_classification_id=#{communityClassification.communityId},update_time=#{updateTime}
+        where main_posts_id=#{mainPostsId}
+    </update>
+
+    <select id="selectMainPostsById" parameterType="int" resultMap="MainPosts">
+        select m.main_posts_id,m.status,m.title,m.content,m.poster_identity,m.number_of_collected,m.number_of_recommended,m.number_of_read,m.number_of_commented,m.create_time,m.update_time,
+        p.plate_id,p.plate_name,u.union_id,u.union_name,c.community_id,c.community_name,
+        a.admin_id aai,a.login_name aln,a.nickname an,a.icon aicon,a.identity ai,
+        us.user_id uui,us.login_name uln,us.nickname un,us.icon uicon,us.identity ui,us.status ust
+        from main_posts m,plate_classification p,union_classification u,community_classification c,admin_info a,user_info us
+        where m.plate_classification_id=p.plate_id and m.union_classification_id=u.union_id and m.community_classification_id=c.community_id
+        and ((m.poster_identity=a.identity and m.poster_id=a.admin_id)
+        or (m.poster_identity=us.identity and m.poster_id=us.user_id))
+        and m.main_posts_id=#{mainPostsId}
+    </select>
+
+    <update id="addTheNumberOfComment" parameterType="int">
+        update main_posts set number_of_commented=number_of_commented+1 where main_posts_id=#{mainPostsId}
+    </update>
+
+    <update id="addTheNumberOfRead" parameterType="int">
+        update main_posts set number_of_read=number_of_read+1 where main_posts_id=#{mainPostsId}
+    </update>
+
+    <update id="addTheNumberOfCollected" parameterType="int">
+        update main_posts set number_of_collected=number_of_collected+1 where main_posts_id=#{mainPostsId}
+    </update>
+
+    <update id="addTheNumberOfRecommended" parameterType="int">
+        update main_posts set number_of_recommended=number_of_recommended+1 where main_posts_id=#{mainPostsId}
+    </update>
+</mapper>

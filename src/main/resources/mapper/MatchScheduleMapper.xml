@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xiazhuoxian.bbs.mapper.MatchScheduleMapper" >
+    
+    <resultMap id="MatchSchedule" type="com.xiazhuoxian.bbs.pojo.MatchSchedule">
+        <id property="id" column="id"/>
+        <result property="seasonNumber" column="season_number"/>
+        <result property="seasonClassification" column="season_classification"/>
+        <result property="matchDate" column="match_date"/>
+        <result property="matchTime" column="match_time"/>
+        <result property="matchRound" column="match_round"/>
+        <result property="homeSection1Score" column="home_section1_score"/>
+        <result property="homeSection2Score" column="home_section2_score"/>
+        <result property="homeSection3Score" column="home_section3_score"/>
+        <result property="homeSection4Score" column="home_section4_score"/>
+        <result property="homeTeamScore" column="home_team_score"/>
+        <result property="homeShoot" column="home_shoot"/>
+        <result property="homeHit" column="home_hit"/>
+        <result property="homeShootingPercentage" column="home_shooting_percentage"/>
+        <result property="homeThreePointShoot" column="home_three_point_shoot"/>
+        <result property="homeThreePointHit" column="home_three_point_hit"/>
+        <result property="homeThreePointPercentage" column="home_three_point_percentage"/>
+        <result property="homeFreeThrowShoot" column="home_free_throw_shoot"/>
+        <result property="homeFreeThrowHit" column="home_free_throw_hit"/>
+        <result property="homeFreeThrowPercentage" column="home_free_throw_percentage"/>
+        <result property="homeFrontCourtRebounds" column="home_front_court_rebounds"/>
+        <result property="homeDefensiveRebounds" column="home_front_court_rebounds"/>
+        <result property="homeBackboard" column="home_backboard"/>
+        <result property="homeAssists" column="home_assists"/>
+        <result property="homeError" column="home_error"/>
+        <result property="homeSteals" column="home_steals"/>
+        <result property="homeBlockShot" column="home_block_shot"/>
+        <result property="homeFoul" column="home_foul"/>
+        <result property="homeUseErrorScore" column="home_use_error_score"/>
+        <result property="homePaintScore" column="home_paint_score"/>
+        <result property="homePaintHitPercentage" column="home_paint_hit_percentage"/>
+        <result property="homeSecondAttackScore" column="home_second_attack_score"/>
+        <result property="homeFastBreakScore" column="home_fast_break_score"/>
+        <result property="awaySection1Score" column="away_section1_score"/>
+        <result property="awaySection2Score" column="away_section2_score"/>
+        <result property="awaySection3Score" column="away_section3_score"/>
+        <result property="awaySection4Score" column="away_section4_score"/>
+        <result property="awayTeamScore" column="away_team_score"/>
+        <result property="awayShoot" column="away_shoot"/>
+        <result property="awayHit" column="away_hit"/>
+        <result property="awayShootingPercentage" column="away_shooting_percentage"/>
+        <result property="awayThreePointShoot" column="away_three_point_shoot"/>
+        <result property="awayThreePointHit" column="away_three_point_hit"/>
+        <result property="awayThreePointPercentage" column="away_three_point_percentage"/>
+        <result property="awayFreeThrowShoot" column="away_free_throw_shoot"/>
+        <result property="awayFreeThrowHit" column="away_free_throw_hit"/>
+        <result property="awayFreeThrowPercentage" column="away_free_throw_percentage"/>
+        <result property="awayFrontCourtRebounds" column="away_front_court_rebounds"/>
+        <result property="awayDefensiveRebounds" column="away_defensive_rebounds"/>
+        <result property="awayBackboard" column="away_backboard"/>
+        <result property="awayAssists" column="away_assists"/>
+        <result property="awayError" column="away_error"/>
+        <result property="awaySteals" column="away_steals"/>
+        <result property="awayBlockShot" column="away_block_shot"/>
+        <result property="awayFoul" column="away_foul"/>
+        <result property="awayUseErrorScore" column="away_use_error_score"/>
+        <result property="awayPaintScore" column="away_paint_score"/>
+        <result property="awayPaintHitPercentage" column="away_paint_hit_percentage"/>
+        <result property="awaySecondAttackScore" column="away_second_attack_score"/>
+        <result property="awayFastBreakScore" column="away_fast_break_score"/>
+        <result property="report" column="report"/>
+        <association property="union" javaType="com.xiazhuoxian.bbs.pojo.UnionClassification">
+            <id property="unionId" column="union_id"/>
+            <result property="unionName" column="union_name"/>
+        </association>
+        <association property="homeTeam" javaType="com.xiazhuoxian.bbs.pojo.TeamInfo">
+            <id property="teamId" column="h_team_id"/>
+            <result property="name" column="h_name"/>
+            <result property="icon" column="h_icon"/>
+            <result property="home" column="home"/>
+        </association>
+        <association property="awayTeam" javaType="com.xiazhuoxian.bbs.pojo.TeamInfo">
+            <id property="teamId" column="a_team_id"/>
+            <result property="name" column="a_name"/>
+            <result property="icon" column="a_icon"/>
+        </association>
+    </resultMap>
+
+    <insert id="insertMatchSchedule" parameterType="com.xiazhuoxian.bbs.pojo.MatchSchedule">
+        insert into match_schedule
+        (union_id,season_number,season_classification,match_date,match_time,match_round,
+        home_team_id,home_section1_score,home_section2_score,home_section3_score,home_section4_score,home_team_score,
+        home_shoot,home_hit,home_shooting_percentage,home_three_point_shoot,home_three_point_hit,home_three_point_percentage,home_free_throw_shoot,home_free_throw_hit,home_free_throw_percentage,
+        home_front_court_rebounds,home_defensive_rebounds,home_backboard,home_assists,home_error,home_steals,home_block_shot,home_foul,home_use_error_score,home_paint_score,home_paint_hit_percentage,
+        home_second_attack_score,home_fast_break_score,
+        away_team_id,away_section1_score,away_section2_score,away_section3_score,away_section4_score,away_team_score,
+        away_shoot,away_hit,away_shooting_percentage,away_three_point_shoot,away_three_point_hit,away_three_point_percentage,away_free_throw_shoot,away_free_throw_hit,away_free_throw_percentage,
+        away_front_court_rebounds,away_defensive_rebounds,away_backboard,away_assists,away_error,away_steals,away_block_shot,away_foul,away_use_error_score,away_paint_score,away_paint_hit_percentage,
+        away_second_attack_score,away_fast_break_score,
+        report)
+        values (
+        #{union.unionId},#{seasonNumber},#{seasonClassification.seasonClassification},#{matchDate},#{matchTime},#{matchRound},
+        #{homeTeam.teamId},#{homeSection1Score},#{homeSection2Score},#{homeSection3Score},#{homeSection4Score},#{homeTeamScore},
+        #{homeShoot},#{homeHit},#{homeShootingPercentage},#{homeThreePointShoot},#{homeThreePointHit},#{homeThreePointPercentage},#{homeFreeThrowShoot},#{homeFreeThrowHit},#{homeFreeThrowPercentage},
+        #{homeFrontCourtRebounds},#{homeDefensiveRebounds},#{homeBackboard},#{homeAssists},#{homeError},#{homeSteals},#{homeBlockShot},#{homeFoul},#{homeUseErrorScore},#{homePaintScore},#{homePaintHitPercentage},
+        #{homeSecondAttackScore},#{homeFastBreakScore},
+        #{awayTeam.teamId},#{awaySection1Score},#{awaySection2Score},#{awaySection3Score},#{awaySection4Score},#{awayTeamScore},
+        #{awayShoot},#{awayHit},#{awayShootingPercentage},#{awayThreePointShoot},#{awayThreePointHit},#{awayThreePointPercentage},#{awayFreeThrowShoot},#{awayFreeThrowHit},#{awayFreeThrowPercentage},
+        #{awayFrontCourtRebounds},#{awayDefensiveRebounds},#{awayBackboard},#{awayAssists},#{awayError},#{awaySteals},#{awayBlockShot},#{awayFoul},#{awayUseErrorScore},#{awayPaintScore},#{awayPaintHitPercentage},
+        #{awaySecondAttackScore},#{awayFastBreakScore},
+        #{report}
+        )
+    </insert>
+    
+    <delete id="deleteMatchScheduleById" parameterType="int">
+        delete from match_schedule where id=#{id}
+    </delete>
+    
+    <update id="updateMatchScheduleById" parameterType="com.xiazhuoxian.bbs.pojo.MatchSchedule">
+        update match_schedule set
+        union_id=#{union.unionId},season_number=#{seasonNumber},season_classification=#{seasonClassification.seasonClassification},match_date=#{matchDate},match_time=#{matchTime},match_round=#{matchRound},
+        home_team_id=#{homeTeam.teamId},home_section1_score=#{homeSection1Score},home_section2_score=#{homeSection2Score},home_section3_score=#{homeSection3Score},home_section4_score=#{homeSection4Score},home_team_score=#{homeTeamScore},
+        home_shoot=#{homeShoot},home_hit=#{homeHit},home_shooting_percentage=#{homeShootingPercentage},home_three_point_shoot=#{homeThreePointShoot},home_three_point_hit=#{homeThreePointHit},home_three_point_percentage=#{homeThreePointPercentage},home_free_throw_shoot=#{homeFreeThrowShoot},home_free_throw_hit=#{homeFreeThrowHit},home_free_throw_percentage=#{homeFreeThrowPercentage},
+        home_front_court_rebounds=#{homeFrontCourtRebounds},home_defensive_rebounds=#{homeDefensiveRebounds},home_backboard=#{homeBackboard},home_assists=#{homeAssists},home_error=#{homeError},home_steals=#{homeSteals},home_block_shot=#{homeBlockShot},home_foul=#{homeFoul},home_use_error_score=#{homeUseErrorScore},home_paint_score=#{homePaintScore},home_paint_hit_percentage=#{homePaintHitPercentage},home_second_attack_score=#{homeSecondAttackScore},home_fast_break_score=#{homeFastBreakScore},
+
+        away_team_id=#{awayTeam.teamId},away_section1_score=#{awaySection1Score},away_section2_score=#{awaySection2Score},away_section3_score=#{awaySection3Score},away_section4_score=#{awaySection4Score},away_team_score=#{awayTeamScore},
+        away_shoot=#{awayShoot},away_hit=#{awayHit},away_shooting_percentage=#{awayShootingPercentage},away_three_point_shoot=#{awayThreePointShoot},away_three_point_hit=#{awayThreePointHit},away_three_point_percentage=#{awayThreePointPercentage},away_free_throw_shoot=#{awayFreeThrowShoot},away_free_throw_hit=#{awayFreeThrowHit},away_free_throw_percentage=#{awayFreeThrowPercentage},
+        away_front_court_rebounds=#{awayFrontCourtRebounds},away_defensive_rebounds=#{awayDefensiveRebounds},away_backboard=#{awayBackboard},away_assists=#{awayAssists},away_error=#{awayError},away_steals=#{awaySteals},away_block_shot=#{awayBlockShot},away_foul=#{awayFoul},away_use_error_score=#{awayUseErrorScore},away_paint_score=#{awayPaintScore},away_paint_hit_percentage=#{awayPaintHitPercentage},away_second_attack_score=#{awaySecondAttackScore},away_fast_break_score=#{awayFastBreakScore},
+        report=#{report}
+        where id=#{id}
+    </update>
+    
+    <select id="selectMatchScheduleById" parameterType="int" resultMap="MatchSchedule">
+        select m.*,u.*,
+        ht.team_id h_team_id,ht.name h_name,ht.icon h_icon,ht.home,
+        at.team_id a_team_id,at.name a_name,at.icon a_icon
+        from match_schedule m,team_info ht,team_info at,union_classification u
+        where id=#{id} and m.home_team_id=ht.team_id and m.away_team_id=at.team_id and m.union_id=u.union_id
+    </select>
+
+    <select id="matchSchedulePagingSelect" resultMap="MatchSchedule">
+        <bind name="firstItem" value="(paging.currentPageNumber-1)*paging.itemsDisplayedPerPage"></bind>
+        select m.*,u.*,
+        ht.team_id h_team_id,ht.name h_name,ht.icon h_icon,
+        at.team_id a_team_id,at.name a_name,at.icon a_icon
+        from (match_schedule m,union_classification u)
+        left join team_info ht on m.home_team_id=ht.team_id
+        left join team_info at on m.away_team_id=at.team_id
+        where
+        m.union_id=u.union_id
+        <if test="matchSchedule.union.unionId!=0">
+            and m.union_id=#{matchSchedule.union.unionId}
+        </if>
+        <if test="matchSchedule.seasonNumber!=0">
+            and m.season_number=#{matchSchedule.seasonNumber}
+        </if>
+        <if test="matchSchedule.seasonClassification!=null">
+            and m.season_classification=#{matchSchedule.seasonClassification}
+        </if>
+        <if test="matchSchedule.homeTeam.teamId!=0">
+            and m.home_team_id=#{matchSchedule.homeTeam.teamId}
+        </if>
+        <if test="matchSchedule.awayTeam.teamId!=0">
+            and m.away_team_id=#{matchSchedule.awayTeam.teamId}
+        </if>
+        <if test="matchSchedule.matchRound!=0">
+            and m.match_round=#{matchSchedule.matchRound}
+        </if>
+        order by m.match_date desc
+        limit #{firstItem},#{paging.itemsDisplayedPerPage}
+    </select>
+
+    <select id="selectMatchScheduleByTeamIdAndSeasonNumber" resultMap="MatchSchedule">
+        <bind name="firstItem" value="(paging.currentPageNumber-1)*paging.itemsDisplayedPerPage"></bind>
+        select m.*,u.*,
+        ht.team_id h_team_id,ht.name h_name,ht.icon h_icon,
+        at.team_id a_team_id,at.name a_name,at.icon a_icon
+        from (match_schedule m,union_classification u)
+        left join team_info ht on m.home_team_id=ht.team_id
+        left join team_info at on m.away_team_id=at.team_id
+        where
+        m.union_id=u.union_id
+            and m.season_number=#{matchSchedule.seasonNumber}
+            and m.season_classification=#{matchSchedule.seasonClassification}
+            and (m.home_team_id=#{matchSchedule.homeTeam.teamId}
+            or m.away_team_id=#{matchSchedule.awayTeam.teamId})
+        order by m.match_round
+    </select>
+
+    <select id="selectTheLastTenMatchScheduleByTeamId" resultMap="MatchSchedule" parameterType="int">
+        select m.*,u.*,
+        ht.team_id h_team_id,ht.name h_name,ht.icon h_icon,
+        at.team_id a_team_id,at.name a_name,at.icon a_icon
+        from (match_schedule m,union_classification u)
+        left join team_info ht on m.home_team_id=ht.team_id
+        left join team_info at on m.away_team_id=at.team_id
+        where
+        m.union_id=u.union_id
+        and (m.home_team_id=#{teamId}
+        or m.away_team_id=#{teamId})
+        order by m.match_date desc
+        limit 0,10
+    </select>
+
+</mapper>

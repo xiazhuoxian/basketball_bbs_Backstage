@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xiazhuoxian.bbs.mapper.AdminMapper" >
+
+    <resultMap id="AdminInfo" type="com.xiazhuoxian.bbs.pojo.AdminInfo">
+        <id column="admin_id" property="adminId"/>
+        <result column="login_name" property="loginName"/>
+        <result column="login_password" property="loginPassword"/>
+        <result column="secret_protection_question" property="secretProtectionQuestion"/>
+        <result column="secret_protection_answer" property="secretProtectionAnswer"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+    
+    <resultMap id="HomePageCarousel" type="com.xiazhuoxian.bbs.pojo.HomePageCarousel">
+        <id column="id" property="id"/>
+        <result column="caption" property="caption"/>
+        <result column="text" property="text"/>
+        <result column="img_src" property="imgSrc"/>
+    </resultMap>
+
+    <select id="selectAdminByLoginName" resultMap="AdminInfo"  parameterType="String">
+        select * from admin_info where login_name = #{loginName}
+    </select>
+
+    <update id="updateAdminInfo" parameterType="com.xiazhuoxian.bbs.pojo.AdminInfo">
+        update admin_info set nickname=#{nickname},address=#{address},phone=#{phone},sex=#{sex} where admin_id=#{adminId}
+    </update>
+
+    <update id="updateIcon" parameterType="com.xiazhuoxian.bbs.pojo.AdminInfo">
+        update admin_info set icon=#{icon} where admin_id=#{adminId}
+    </update>
+    
+    <select id="selectHomePageCarousel" resultMap="HomePageCarousel">
+        select * from home_page_carousel
+    </select>
+
+    <select id="selectHomePageCarouselById" resultMap="HomePageCarousel" parameterType="int">
+        select * from home_page_carousel where id=#{id}
+    </select>
+    
+    <update id="updateHomePageCarousel" parameterType="com.xiazhuoxian.bbs.pojo.HomePageCarousel">
+        update home_page_carousel
+        set caption=#{caption},text=#{text},img_src=#{imgSrc}
+        where id=#{id}
+    </update>
+
+</mapper>

@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xiazhuoxian.bbs.mapper.TeamMapper" >
+
+    <resultMap id="TeamInfo" type="com.xiazhuoxian.bbs.pojo.TeamInfo">
+        <id property="teamId" column="team_id"/>
+        <result property="name" column="name"/>
+        <result property="icon" column="icon"/>
+        <result property="local" column="local"/>
+        <result property="home" column="home"/>
+        <result property="introduce" column="introduce"/>
+        <association property="union" javaType="com.xiazhuoxian.bbs.pojo.UnionClassification">
+            <id property="unionId" column="union_id"/>
+            <result property="unionName" column="union_name"/>
+        </association>
+        <association property="partition" javaType="com.xiazhuoxian.bbs.pojo.PartitionClassification">
+            <id property="partitionId" column="partition_id"/>
+            <result property="partitionName" column="partition_name"/>
+        </association>
+    </resultMap>
+    
+    <resultMap id="TeamAverageData" type="com.xiazhuoxian.bbs.pojo.TeamAverageData">
+        <id property="Id" column="id"/>
+        <result property="seasonNumber" column="season_number"/>
+        <result property="seasonClassification" column="season_classification"/>
+        <result property="numberOfMatch" column="number_of_match"/>
+        <result property="numberHomeWin" column="number_home_win"/>
+        <result property="numberHomeFail" column="number_home_fail"/>
+        <result property="numberAwayWin" column="number_away_win"/>
+        <result property="numberAwayFail" column="number_away_fail"/>
+        <result property="score" column="score"/>
+        <result property="losePoints" column="lose_points"/>
+        <result property="backboard" column="backboard"/>
+        <result property="assists" column="assists"/>
+        <result property="error" column="error"/>
+        <result property="steals" column="steals"/>
+        <result property="blockShot" column="block_shot"/>
+        <result property="foul" column="foul"/>
+        <result property="shoot" column="shoot"/>
+        <result property="hit" column="hit"/>
+        <result property="shootingPercentage" column="shooting_percentage"/>
+        <result property="threePointShot" column="three_point_shot"/>
+        <result property="threePointHit" column="three_point_hit"/>
+        <result property="threePointPercentage" column="three_point_percentage"/>
+        <result property="freeThrowShot" column="free_throw_shot"/>
+        <result property="freeThrowHit" column="free_throw_hit"/>
+        <result property="freeThrowPercentage" column="free_throw_percentage"/>
+        <result property="paintScore" column="paint_score"/>
+        <result property="fastBreakScore" column="fast_break_score"/>
+        <result property="secondAttackScore" column="second_attack_score"/>
+        <result property="useErrorScore" column="use_error_score"/>
+        <result property="substituteScore" column="substitute_score"/>
+        <result property="rounds" column="rounds"/>
+        <association property="team" javaType="com.xiazhuoxian.bbs.pojo.TeamInfo">
+            <id property="teamId" column="team_id"/>
+            <result property="name" column="name"/>
+            <result property="icon" column="icon"/>
+        </association>
+    </resultMap>
+    
+    <insert id="insertTeamInfo" parameterType="com.xiazhuoxian.bbs.pojo.TeamInfo">
+        insert into team_info
+        (name,icon,union_id,partition_id,local,home,introduce)
+        values(
+        #{name},#{icon},#{union.unionId},#{partition.partitionId},#{local},#{home},#{introduce}
+        )
+    </insert>
+    
+    <delete id="deleteTeamInfoById" parameterType="int">
+        delete from team_info where team_id=#{teamId}
+    </delete>
+
+    <update id="updateTeamInfo" parameterType="com.xiazhuoxian.bbs.pojo.TeamInfo">
+        update team_info set name=#{name},
+        <if test="icon!=null">
+            icon=#{icon},
+        </if>
+        union_id=#{union.unionId},partition_id=#{partition.partitionId},local=#{local},home=#{home},introduce=#{introduce}
+        where team_id=#{teamId}
+    </update>
+    
+    <select id="selectTeamInfoById" parameterType="int" resultMap="TeamInfo">
+        select * from team_info t,union_classification u,partition_classification p
+        where team_id=#{teamId} and t.union_id=u.union_id and t.partition_id=p.partition_id
+    </select>
+
+    <select id="selectTeamInfoByUnion" parameterType="int" resultMap="TeamInfo">
+        select * from team_info t,union_classification u,partition_classification p
+        where t.union_id=#{unionId} and t.union_id=u.union_id and t.partition_id=p.partition_id
+    </select>
+
+
+
+    <insert id="insertTeamAverageData" parameterType="com.xiazhuoxian.bbs.pojo.TeamAverageData">
+        insert into team_average_data
+        (team_id,season_number,season_classification,number_of_match,number_home_win,number_home_fail,number_away_win,number_away_fail,
+        score,lose_points,backboard,assists,error,steals,block_shot,shoot,hit,shooting_percentage,three_point_shot,three_point_hit,three_point_percentage,
+        free_throw_shot,free_throw_hit,free_throw_percentage,foul,paint_score,fast_break_score,second_attack_score,use_error_score,substitute_score,rounds)
+        values (
+        #{team.teamId},#{seasonNumber},#{seasonClassification},#{numberOfMatch},#{numberHomeWin},#{numberHomeFail},#{numberAwayWin},#{numberAwayFail},
+        #{score},#{losePoints},#{backboard},#{assists},#{error},#{steals},#{blockShot},#{shoot},#{hit},#{shootingPercentage},#{threePointShot},#{threePointHit},#{threePointPercentage},
+        #{freeThrowShot},#{freeThrowHit},#{freeThrowPercentage},#{foul},#{paintScore},#{fastBreakScore},#{secondAttackScore},#{useErrorScore},#{substituteScore},#{rounds}
+        )
+    </insert>
+
+    <delete id="deleteTeamAverageData" parameterType="int">
+        delete from team_average_data where id=#{id}
+    </delete>
+
+    <update id="updataTeamAverageData" parameterType="com.xiazhuoxian.bbs.pojo.TeamAverageData">
+        update team_average_data set
+        team_id=#{team.teamId},season_number=#{seasonNumber},season_classification=#{seasonClassification},number_of_match=#{numberOfMatch},number_home_win=#{numberHomeWin},number_home_fail=#{numberHomeFail},number_away_win=#{numberAwayWin},number_away_fail=#{numberAwayFail},
+        score=#{score},lose_points=#{losePoints},backboard=#{backboard},assists=#{assists},error=#{error},steals=#{steals},block_shot=#{blockShot},shoot=#{shoot},hit=#{hit},shooting_percentage=#{shootingPercentage},three_point_shot=#{threePointShot},three_point_hit=#{threePointHit},three_point_percentage=#{threePointPercentage},
+        free_throw_shot=#{freeThrowShot},free_throw_hit=#{freeThrowHit},free_throw_percentage=#{freeThrowPercentage},foul=#{foul},paint_score=#{paintScore},fast_break_score=#{fastBreakScore},second_attack_score=#{secondAttackScore},use_error_score=#{useErrorScore},substitute_score=#{substituteScore},rounds=#{rounds}
+        where id=#{id}
+    </update>
+
+    <select id="selectTeamAverageDataIfExist" parameterType="com.xiazhuoxian.bbs.pojo.TeamAverageData" resultMap="TeamAverageData">
+        select d.*,i.team_id,i.name,i.icon
+        from team_average_data d,team_info i
+        where d.team_id=#{team.teamId} and d.season_number=#{seasonNumber} and d.season_classification=#{seasonClassification} and d.team_id=i.team_id
+    </select>
+
+    <select id="selectTheLastTeamAverageData" parameterType="com.xiazhuoxian.bbs.pojo.TeamAverageData" resultMap="TeamAverageData">
+        select d.*,i.team_id,i.name,i.icon
+        from team_average_data d,team_info i
+        where d.team_id=#{team.teamId} and
+          d.season_classification=#{seasonClassification} and
+          d.team_id=i.team_id
+        order by d.season_number desc
+        limit 1
+    </select>
+    
+    <select id="selectTeamList" resultMap="TeamInfo">
+        select * from team_info t,union_classification u,partition_classification p
+        where t.union_id=u.union_id and t.partition_id=p.partition_id
+    </select>
+
+    <select id="selectTeamByTeamName" parameterType="String" resultMap="TeamInfo">
+        select * from team_info where name=#{name}
+    </select>
+
+</mapper>

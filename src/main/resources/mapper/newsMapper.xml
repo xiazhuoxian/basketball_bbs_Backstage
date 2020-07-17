@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xiazhuoxian.bbs.mapper.NewsMapper" >
+
+    <resultMap id="News" type="com.xiazhuoxian.bbs.pojo.News">
+        <id column="news_id" property="newsId"/>
+        <result column="cover" property="cover"/>
+        <result column="title" property="title"/>
+        <result column="content" property="content"/>
+        <result column="number_of_collected" property="numberOfCollected"/>
+        <result column="number_of_recommended" property="numberOfRecommended"/>
+        <result column="number_of_read" property="numberOfRead"/>
+        <result column="number_of_commented" property="numberOfCommented"/>
+        <result column="update_time" property="updateTime"/>
+        <association property="plateClassification" javaType="com.xiazhuoxian.bbs.pojo.PlateClassification">
+            <id property="plateId" column="plate_id"/>
+            <result property="plateName" column="plate_name"/>
+        </association>
+        <association property="unionClassification" javaType="com.xiazhuoxian.bbs.pojo.UnionClassification">
+            <id property="unionId" column="union_id"/>
+            <result property="unionName" column="union_name"/>
+        </association>
+        <association property="poster" javaType="com.xiazhuoxian.bbs.pojo.AdminInfo">
+            <id column="admin_id" property="adminId"/>
+            <result column="login_name" property="loginName"/>
+            <result column="login_password" property="loginPassword"/>
+            <result column="nickname" property="nickname"/>
+            <result column="address" property="address"/>
+            <result column="phone" property="phone"/>
+            <result column="sex" property="sex"/>
+            <result column="icon" property="icon"/>
+            <result column="secret_protection_question" property="secretProtectionQuestion"/>
+            <result column="secret_protection_answer" property="secretProtectionAnswer"/>
+            <result column="create_time" property="createTime"/>
+            <result column="update_time" property="updateTime"/>
+            <result column="jurisdiction" property="jurisdiction"/>
+            <result column="identity" property="identity"/>
+        </association>
+    </resultMap>
+    
+    <select id="newsPagingSelect" parameterType="com.xiazhuoxian.bbs.pojo.Paging" resultMap="News">
+        <bind name="firstItem" value="(currentPageNumber-1)*itemsDisplayedPerPage"></bind>
+        select * from news n,plate_classification p,union_classification u,admin_info a
+          where n.plate_classification_id=p.plate_id and n.union_classification_id=u.union_id and n.poster_id=a.admin_id
+        <if test="selectCondition!=null and selectCondition!=''">
+            and n.title like CONCAT('%',#{selectCondition},'%')
+        </if>
+        limit #{firstItem},#{itemsDisplayedPerPage}
+    </select>
+    
+    <insert id="insertNews" parameterType="com.xiazhuoxian.bbs.pojo.News">
+        insert into news
+        (plate_classification_id,union_classification_id,cover,title,content,poster_id,number_of_collected,number_of_recommended,number_of_read,number_of_commented,update_time)
+        values (
+        #{plateClassification.plateId},#{unionClassification.unionId},#{cover},#{title},#{content},#{poster.adminId},#{numberOfCollected},#{numberOfRecommended},#{numberOfRead},#{numberOfCommented},#{updateTime}
+        );
+    </insert>
+
+    <delete id="deleteNewsById" parameterType="int">
+        delete from news where news_id=#{newsId}
+    </delete>
+    
+    <update id="updateNews" parameterType="com.xiazhuoxian.bbs.pojo.News">
+        update news set cover=#{cover},title=#{title},content=#{content},plate_classification_id=#{plateClassification.plateId},union_classification_id=#{unionClassification.unionId},update_time=#{updateTime}
+        where news_id=#{newsId}
+    </update>
+    
+    <select id="selectNewsById" parameterType="int" resultMap="News">
+        select * from news n,plate_classification p,union_classification u,admin_info a
+        where n.plate_classification_id=p.plate_id and n.union_classification_id=u.union_id and n.poster_id=a.admin_id
+        and n.news_id=#{newsId}
+    </select>
+
+    <select id="selectTheLastNews" resultMap="News">
+        select * from news n,plate_classification p,union_classification u,admin_info a
+        where n.plate_classification_id=p.plate_id and n.union_classification_id=u.union_id and n.poster_id=a.admin_id
+        order by n.update_time desc
+        limit 0,5
+    </select>
+
+    <select id="selectTheHotNews" resultMap="News">
+        select * from news n,plate_classification p,union_classification u,admin_info a
+        where n.plate_classification_id=p.plate_id and n.union_classification_id=u.union_id and n.poster_id=a.admin_id
+        order by n.number_of_read desc
+        limit 0,10
+    </select>
+</mapper>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xiazhuoxian.bbs.mapper.UserMapper" >
+
+    <resultMap id="UserInfo" type="com.xiazhuoxian.bbs.pojo.UserInfo">
+        <id column="user_id" property="userId"/>
+        <result column="login_name" property="loginName"/>
+        <result column="login_password" property="loginPassword"/>
+        <result column="secret_protection_question" property="secretProtectionQuestion"/>
+        <result column="secret_protection_answer" property="secretProtectionAnswer"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <insert id="insertUser" parameterType="com.xiazhuoxian.bbs.pojo.UserInfo">
+        insert into user_info
+        (login_name,login_password,nickname,address,phone,sex,icon,secret_protection_question,secret_protection_answer,create_time,update_time,status,identity)
+        values (
+        #{loginName},#{loginPassword},#{nickname},#{address},#{phone},#{sex},#{icon},#{secretProtectionQuestion},#{secretProtectionAnswer},#{createTime},#{updateTime},#{status},#{identity}
+        )
+    </insert>
+    
+    <delete id="deleteUserById" parameterType="int">
+        delete from user_info where user_id=#{userId}
+    </delete>
+
+    <update id="updateUserInfo" parameterType="com.xiazhuoxian.bbs.pojo.UserInfo">
+        update user_info set nickname=#{nickname},address=#{address},phone=#{phone},sex=#{sex} where user_id=#{userId}
+    </update>
+
+    <update id="updateIcon" parameterType="com.xiazhuoxian.bbs.pojo.UserInfo">
+        update user_info set icon=#{icon} where user_id=#{userId}
+    </update>
+
+    <select id="selectUserByLoginName" resultMap="UserInfo"  parameterType="String">
+        select * from user_info where login_name = #{loginName}
+    </select>
+
+    <select id="selectUserById" resultMap="UserInfo"  parameterType="int">
+        select * from user_info where user_id = #{userId}
+    </select>
+
+    <select id="userPagingSelect" parameterType="com.xiazhuoxian.bbs.pojo.Paging" resultMap="UserInfo">
+        <bind name="firstItem" value="(currentPageNumber-1)*itemsDisplayedPerPage"></bind>
+        select * from user_info
+        <where>
+          <if test="selectCondition!=null and selectCondition!=''">
+              and login_name like CONCAT('%',#{selectCondition},'%')
+          </if>
+        </where>
+        limit #{firstItem},#{itemsDisplayedPerPage}
+    </select>
+</mapper>

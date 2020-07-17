@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xiazhuoxian.bbs.mapper.ClassificationMapper" >
+
+    <resultMap id="Union" type="com.xiazhuoxian.bbs.pojo.UnionClassification">
+        <id property="unionId" column="union_id"/>
+        <result property="unionName" column="union_name"/>
+    </resultMap>
+    
+    <select id="selectUnionByUnionName" parameterType="String" resultMap="Union">
+        select *
+        from union_classification
+        where union_name=#{unionName}
+    </select>
+</mapper>

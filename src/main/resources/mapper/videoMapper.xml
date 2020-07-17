@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xiazhuoxian.bbs.mapper.VideoMapper" >
+
+    <resultMap id="Video" type="com.xiazhuoxian.bbs.pojo.Video">
+        <id column="video_id" property="videoId"/>
+        <result column="cover" property="cover"/>
+        <result column="title" property="title"/>
+        <result column="video_address" property="videoAddress"/>
+        <result column="content" property="content"/>
+        <result column="number_of_collected" property="numberOfCollected"/>
+        <result column="number_of_recommended" property="numberOfRecommended"/>
+        <result column="number_of_read" property="numberOfRead"/>
+        <result column="number_of_commented" property="numberOfCommented"/>
+        <result column="update_time" property="updateTime"/>
+        <association property="plateClassification" javaType="com.xiazhuoxian.bbs.pojo.PlateClassification">
+            <id property="plateId" column="plate_id"/>
+            <result property="plateName" column="plate_name"/>
+        </association>
+        <association property="unionClassification" javaType="com.xiazhuoxian.bbs.pojo.UnionClassification">
+            <id property="unionId" column="union_id"/>
+            <result property="unionName" column="union_name"/>
+        </association>
+        <association property="poster" javaType="com.xiazhuoxian.bbs.pojo.AdminInfo">
+            <id column="admin_id" property="adminId"/>
+            <result column="login_name" property="loginName"/>
+            <result column="login_password" property="loginPassword"/>
+            <result column="nickname" property="nickname"/>
+            <result column="address" property="address"/>
+            <result column="phone" property="phone"/>
+            <result column="sex" property="sex"/>
+            <result column="icon" property="icon"/>
+            <result column="secret_protection_question" property="secretProtectionQuestion"/>
+            <result column="secret_protection_answer" property="secretProtectionAnswer"/>
+            <result column="create_time" property="createTime"/>
+            <result column="update_time" property="updateTime"/>
+            <result column="jurisdiction" property="jurisdiction"/>
+            <result column="identity" property="identity"/>
+        </association>
+    </resultMap>
+
+    <select id="videoPagingSelect" parameterType="com.xiazhuoxian.bbs.pojo.Paging" resultMap="Video">
+        <bind name="firstItem" value="(currentPageNumber-1)*itemsDisplayedPerPage"></bind>
+        select * from video v,plate_classification p,union_classification u,admin_info a
+        where v.plate_classification_id=p.plate_id and v.union_classification_id=u.union_id and v.poster_id=a.admin_id
+        <if test="selectCondition!=null and selectCondition!=''">
+            and v.title like CONCAT('%',#{selectCondition},'%')
+        </if>
+        limit #{firstItem},#{itemsDisplayedPerPage}
+    </select>
+
+    <insert id="insertVideo" parameterType="com.xiazhuoxian.bbs.pojo.Video">
+        insert into video
+        (video_address,plate_classification_id,union_classification_id,cover,title,content,poster_id,number_of_collected,number_of_recommended,number_of_read,number_of_commented,update_time)
+        values (
+        #{videoAddress},#{plateClassification.plateId},#{unionClassification.unionId},#{cover},#{title},#{content},#{poster.adminId},#{numberOfCollected},#{numberOfRecommended},#{numberOfRead},#{numberOfCommented},#{updateTime}
+        );
+    </insert>
+
+    <delete id="deleteVideoById" parameterType="int">
+        delete from video where video_id=#{videoId}
+    </delete>
+
+    <update id="updateVideo" parameterType="com.xiazhuoxian.bbs.pojo.Video">
+        update video set video_address=#{videoAddress},cover=#{cover},title=#{title},content=#{content},plate_classification_id=#{plateClassification.plateId},union_classification_id=#{unionClassification.unionId},update_time=#{updateTime}
+        where video_id=#{videoId}
+    </update>
+
+    <select id="selectVideoById" parameterType="int" resultMap="Video">
+        select * from video v,plate_classification p,union_classification u,admin_info a
+        where v.plate_classification_id=p.plate_id and v.union_classification_id=u.union_id and v.poster_id=a.admin_id
+        and v.video_id=#{videoId}
+    </select>
+
+    <select id="selectTheLastVideo" resultMap="Video">
+        select * from video v,plate_classification p,union_classification u,admin_info a
+        where v.plate_classification_id=p.plate_id and v.union_classification_id=u.union_id and v.poster_id=a.admin_id
+        order by v.update_time desc
+        limit 0,8
+    </select>
+
+    <select id="selectTheHotVideo" resultMap="Video">
+        select * from video v,plate_classification p,union_classification u,admin_info a
+        where v.plate_classification_id=p.plate_id and v.union_classification_id=u.union_id and v.poster_id=a.admin_id
+        order by v.number_of_read desc
+        limit 0,10
+    </select>
+</mapper>

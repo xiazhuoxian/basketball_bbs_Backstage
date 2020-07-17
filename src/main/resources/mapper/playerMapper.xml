@@ -1,0 +1,340 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xiazhuoxian.bbs.mapper.PlayerMapper" >
+
+    <resultMap id="PlayerInfo" type="com.xiazhuoxian.bbs.pojo.PlayerInfo">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="icon" column="icon"/>
+        <result property="number" column="number"/>
+        <result property="position" column="position"/>
+        <result property="birth" column="birth"/>
+        <result property="age" column="age"/>
+        <result property="height" column="height"/>
+        <result property="armExhibition" column="arm_exhibition"/>
+        <result property="weight" column="weight"/>
+        <result property="standingReach" column="standing_reach"/>
+        <result property="nationality" column="nationality"/>
+        <result property="wages" column="wages"/>
+        <result property="introduce" column="introduce"/>
+        <association property="teamInfo" javaType="com.xiazhuoxian.bbs.pojo.TeamInfo">
+            <id property="teamId" column="team_id"/>
+            <result property="name" column="tname"/>
+            <result property="icon" column="ticon"/>
+            <association property="union" javaType="com.xiazhuoxian.bbs.pojo.UnionClassification">
+                <id property="unionId" column="union_id"/>
+                <result property="unionName" column="union_name"/>
+            </association>
+            <association property="partition" javaType="com.xiazhuoxian.bbs.pojo.PartitionClassification">
+                <id property="partitionId" column="partition_id"/>
+                <result property="partitionName" column="partition_name"/>
+            </association>
+        </association>
+    </resultMap>
+
+    <resultMap id="PlayerSingleMatchData" type="com.xiazhuoxian.bbs.pojo.PlayerSingleMatchData">
+        <id property="id" column="id"/>
+        <result property="palyingTime" column="playing_time"/>
+        <result property="score" column="score"/>
+        <result property="shot" column="shot"/>
+        <result property="hit" column="hit"/>
+        <result property="shootingPercentage" column="shooting_percentage"/>
+        <result property="threePointShot" column="three_point_shot"/>
+        <result property="threePointHit" column="three_point_hit"/>
+        <result property="threePointPercentage" column="three_point_percentage"/>
+        <result property="freeThrowShot" column="free_throw_shot"/>
+        <result property="freeThrowHit" column="free_throw_hit"/>
+        <result property="freeThrowPercentage" column="free_throw_percentage"/>
+        <result property="paintScore" column="paint_score"/>
+        <result property="frontCourtRebounds" column="front_court_rebounds"/>
+        <result property="defensiveRebounds" column="defensive_rebounds"/>
+        <result property="backboard" column="backboard"/>
+        <result property="assists" column="assists"/>
+        <result property="error" column="error"/>
+        <result property="steals" column="steals"/>
+        <result property="blockShot" column="block_shot"/>
+        <result property="fastBreakScore" column="fast_break_score"/>
+        <result property="foul" column="foul"/>
+        <association property="playerInfo" javaType="com.xiazhuoxian.bbs.pojo.PlayerInfo">
+            <id property="id" column="pid"/>
+            <result property="name" column="name"/>
+            <result property="icon" column="icon"/>
+            <result property="position" column="position"/>
+            <association property="teamInfo" javaType="com.xiazhuoxian.bbs.pojo.TeamInfo">
+                <id property="teamId" column="team_id"/>
+                <result property="name" column="teamName"/>
+            </association>
+        </association>
+        <association property="matchSchedule" javaType="com.xiazhuoxian.bbs.pojo.MatchSchedule">
+            <id property="id" column="mid"/>
+            <result property="seasonNumber" column="season_number"/>
+            <result property="seasonClassification" column="season_classification"/>
+            <result property="matchDate" column="match_date"/>
+            <result property="homeTeamScore" column="home_team_score"/>
+            <result property="awayTeamScore" column="away_team_score"/>
+            <association property="homeTeam" javaType="com.xiazhuoxian.bbs.pojo.TeamInfo">
+                <id property="teamId" column="h_team_id"/>
+                <result property="name" column="h_name"/>
+                <result property="icon" column="h_icon"/>
+            </association>
+            <association property="awayTeam" javaType="com.xiazhuoxian.bbs.pojo.TeamInfo">
+                <id property="teamId" column="a_team_id"/>
+                <result property="name" column="a_name"/>
+                <result property="icon" column="a_icon"/>
+            </association>
+        </association>
+    </resultMap>
+    
+    <resultMap id="PlayerAverageData" type="com.xiazhuoxian.bbs.pojo.PlayerAverageData">
+        <id property="id" column="id"/>
+        <result property="seasonNumber" column="season_number"/>
+        <result property="seasonClassification" column="season_classification"/>
+        <result property="playingTime" column="playing_time"/>
+        <result property="score" column="score"/>
+        <result property="frontCourtRebounds" column="front_court_rebounds"/>
+        <result property="defensiveRebounds" column="defensive_rebounds"/>
+        <result property="backboard" column="backboard"/>
+        <result property="assists" column="assists"/>
+        <result property="error" column="error"/>
+        <result property="steals" column="steals"/>
+        <result property="blockShot" column="block_shot"/>
+        <result property="shoot" column="shoot"/>
+        <result property="hit" column="hit"/>
+        <result property="shootingPercentage" column="shooting_percentage"/>
+        <result property="threePointShoot" column="three_point_shoot"/>
+        <result property="threePointHit" column="three_point_hit"/>
+        <result property="threePointPercentage" column="three_point_percentage"/>
+        <result property="freeThrowShoot" column="free_throw_shoot"/>
+        <result property="freeThrowHit" column="free_throw_hit"/>
+        <result property="freeThrowPercentage" column="free_throw_percentage"/>
+        <result property="fastBreakScore" column="fast_break_score"/>
+        <result property="seasonHighestScore" column="season_highest_score"/>
+        <result property="foul" column="foul"/>
+        <result property="numberOfMatches" column="number_of_matches"/>
+        <association property="playerInfo" javaType="com.xiazhuoxian.bbs.pojo.PlayerInfo">
+            <id property="id" column="pid"/>
+            <result property="name" column="pname"/>
+            <result property="icon" column="picon"/>
+            <result property="number" column="number"/>
+            <result property="position" column="position"/>
+            <result property="birth" column="birth"/>
+            <result property="age" column="age"/>
+            <result property="height" column="height"/>
+            <result property="armExhibition" column="arm_exhibition"/>
+            <result property="weight" column="weight"/>
+            <result property="standingReach" column="standing_reach"/>
+            <result property="nationality" column="nationality"/>
+            <result property="wages" column="wages"/>
+            <result property="introduce" column="introduce"/>
+            <association property="teamInfo" javaType="com.xiazhuoxian.bbs.pojo.TeamInfo">
+                <id property="teamId" column="team_id"/>
+                <result property="name" column="tname"/>
+                <result property="icon" column="ticon"/>
+                <association property="union" javaType="com.xiazhuoxian.bbs.pojo.UnionClassification">
+                    <id property="unionId" column="union_id"/>
+                    <result property="unionName" column="union_name"/>
+                </association>
+                <association property="partition" javaType="com.xiazhuoxian.bbs.pojo.PartitionClassification">
+                    <id property="partitionId" column="partition_id"/>
+                    <result property="partitionName" column="partition_name"/>
+                </association>
+            </association>
+        </association>
+        <association property="teamInfo" column="com.xiazhuoxian.bbs.pojo.TeamInfo">
+            <id property="teamId" column="team_id"/>
+            <result property="name" column="tname"/>
+            <result property="icon" column="ticon"/>
+        </association>
+    </resultMap>
+    
+    <insert id="insertPlayInfo" parameterType="com.xiazhuoxian.bbs.pojo.PlayerInfo">
+        insert into player_info(
+          name,icon,team_id,number,position,birth,age,height,arm_exhibition,weight,standing_reach,nationality,wages,introduce
+        )values (
+        #{name},#{icon},#{teamInfo.teamId},#{number},#{position},#{birth},#{age},#{height},#{armExhibition},#{weight},#{standingReach},#{nationality},#{wages},#{introduce}
+        )
+    </insert>
+
+    <delete id="deletePlayInfo" parameterType="int">
+        delete from player_info where id=#{id}
+    </delete>
+    
+    <update id="updatePlayInfo" parameterType="com.xiazhuoxian.bbs.pojo.PlayerInfo">
+        update player_info set
+        name=#{name},icon=#{icon},team_id=#{teamInfo.teamId},number=#{number},position=#{position},birth=#{birth},age=#{age},height=#{height},arm_exhibition=#{armExhibition},weight=#{weight},standing_reach=#{standingReach},nationality=#{nationality},wages=#{wages},introduce=#{introduce}
+        where id=#{id}
+    </update>
+    
+    <select id="selectPlayInfoById" parameterType="int" resultMap="PlayerInfo">
+        select p.*,t.name tname,t.icon ticon,
+        u.*,c.*
+        from player_info p,team_info t,union_classification u,partition_classification c
+        where p.id=#{id} and p.team_id=t.team_id and t.union_id=u.union_id and t.partition_id=c.partition_id
+    </select>
+
+    <select id="playerInfoPagingSelect" resultMap="PlayerInfo">
+        <bind name="firstItem" value="(paging.currentPageNumber-1)*paging.itemsDisplayedPerPage"></bind>
+        select p.*,t.*,u.*
+        from player_info p
+        inner join team_info t
+        on p.team_id=t.team_id
+        <if test="teamId!=null and teamId!=''">
+            and t.team_id =#{teamId}
+        </if>
+        inner join union_classification u
+        on t.union_id=u.union_id
+        <if test="union!=null and union!=''">
+            and t.union_id =#{union.unionId}
+        </if>
+        limit #{firstItem},#{paging.itemsDisplayedPerPage}
+    </select>
+
+    <select id="playerInfoSelect" resultMap="PlayerInfo">
+        select p.*,t.*,u.*
+        from player_info p
+        inner join team_info t
+        on p.team_id=t.team_id
+        <if test="teamId!=null and teamId!=''">
+            and t.team_id =#{teamId}
+        </if>
+        inner join union_classification u
+        on t.union_id=u.union_id
+        <if test="union!=null and union.unionId!=0">
+            and t.union_id =#{union.unionId}
+        </if>
+    </select>
+    
+    <insert id="insertPlayerSingleMatchData" parameterType="com.xiazhuoxian.bbs.pojo.PlayerSingleMatchData">
+        insert into player_single_match_data (
+        player_id,match_id,playing_time,score,shot,hit,shooting_percentage,
+        three_point_shot,three_point_hit,three_point_percentage,free_throw_shot,free_throw_hit,free_throw_percentage,
+        paint_score,front_court_rebounds,defensive_rebounds,backboard,
+        assists,error,steals,block_shot,fast_break_score,foul
+        )values (
+        #{playerInfo.id},#{matchSchedule.id},#{palyingTime},#{score},#{shot},#{hit},#{shootingPercentage},
+        #{threePointShot},#{threePointHit},#{threePointPercentage},#{freeThrowShot},#{freeThrowHit},#{freeThrowPercentage},
+        #{paintScore},#{frontCourtRebounds},#{defensiveRebounds},#{backboard},
+        #{assists},#{error},#{steals},#{blockShot},#{fastBreakScore},#{foul}
+        )
+    </insert>
+    
+    <delete id="deletePlayerSingleMatchData" parameterType="int">
+        delete from player_single_match_data where id=#{id}
+    </delete>
+    
+    <update id="updatePlayerSingleMatchData" parameterType="com.xiazhuoxian.bbs.pojo.PlayerSingleMatchData">
+        update player_single_match_data set
+        player_id=#{playerInfo.id},match_id=#{matchSchedule.id},playing_time=#{palyingTime},score=#{score},
+        shot=#{shot},hit=#{hit},shooting_percentage=#{shootingPercentage},
+        three_point_shot=#{threePointShot},three_point_hit=#{threePointHit},three_point_percentage=#{threePointPercentage},
+        free_throw_shot=#{freeThrowShot},free_throw_hit=#{freeThrowHit},free_throw_percentage=#{freeThrowPercentage},
+        paint_score=#{paintScore},front_court_rebounds=#{frontCourtRebounds},defensive_rebounds=#{defensiveRebounds},backboard=#{backboard},
+        assists=#{assists},error=#{error},steals=#{steals},block_shot=#{blockShot},fast_break_score=#{fastBreakScore},foul=#{foul}
+        where id=#{id}
+    </update>
+
+    <select id="selectPlayerSingleMatchDataById" parameterType="int" resultMap="PlayerSingleMatchData">
+        select d.*,i.id pid,i.name,i.icon,t.team_id,t.name teamName,m.id mid,m.season_number,m.season_classification
+        from player_single_match_data d,player_info i,team_info t,match_schedule m
+        where d.id=#{id} and d.player_id=i.id and i.team_id=t.team_id and m.id=d.match_id
+    </select>
+    
+    <select id="selectPlayerSingleMatchDataByMatchId" parameterType="int" resultMap="PlayerSingleMatchData">
+        select d.*,i.id pid,i.name,i.icon,i.position,t.team_id,t.name teamName
+        from player_single_match_data d,team_info t,player_info i
+        where d.match_id=#{id} and d.player_id=i.id and i.team_id=t.team_id
+    </select>
+    
+    <insert id="insertPlayerAverageData" parameterType="com.xiazhuoxian.bbs.pojo.PlayerAverageData">
+        insert into player_average_data (
+          player_id,team_id,season_number,season_classification,playing_time,score,
+          front_court_rebounds,defensive_rebounds,backboard,assists,error,steals,
+          block_shot,shoot,hit,shooting_percentage,three_point_shoot,three_point_hit,
+          three_point_percentage,free_throw_shoot,free_throw_hit,free_throw_percentage,
+          fast_break_score,season_highest_score,foul,number_of_matches
+        )values (
+          #{playerInfo.id},#{teamInfo.teamId},#{seasonNumber},#{seasonClassification},#{playingTime},#{score},
+          #{frontCourtRebounds},#{defensiveRebounds},#{backboard},#{assists},#{error},#{steals},
+          #{blockShot},#{shoot},#{hit},#{shootingPercentage},#{threePointShoot},#{threePointHit},
+          #{threePointPercentage},#{freeThrowShoot},#{freeThrowHit},#{freeThrowPercentage},
+          #{fastBreakScore},#{seasonHighestScore},#{foul},#{numberOfMatches}
+        )
+    </insert>
+    
+    <delete id="deletePlayerAverageData" parameterType="int">
+        delete from player_average_data where id=#{id}
+    </delete>
+
+    <update id="updatePlayerAverageData" parameterType="com.xiazhuoxian.bbs.pojo.PlayerAverageData">
+        update player_average_data set
+        player_id=#{playerInfo.id},team_id=#{teamInfo.teamId},season_number=#{seasonNumber},
+        season_classification=#{seasonClassification},playing_time=#{playingTime},score=#{score},
+        front_court_rebounds=#{frontCourtRebounds},defensive_rebounds=#{defensiveRebounds},
+        backboard=#{backboard},assists=#{assists},error=#{error},steals=#{steals},block_shot=#{blockShot},
+        shoot=#{shoot},hit=#{hit},shooting_percentage=#{shootingPercentage},
+        three_point_shoot=#{threePointShoot},three_point_hit=#{threePointHit},
+        three_point_percentage=#{threePointPercentage},free_throw_shoot=#{freeThrowShoot},
+        free_throw_hit=#{freeThrowHit},free_throw_percentage=#{freeThrowPercentage},
+        fast_break_score=#{fastBreakScore},season_highest_score=#{seasonHighestScore},foul=#{foul},number_of_matches=#{numberOfMatches}
+        where id=#{id}
+    </update>
+    
+    <select id="selectPlayerAverageData" parameterType="com.xiazhuoxian.bbs.pojo.PlayerAverageData" resultMap="PlayerAverageData">
+      select d.*,
+      p.id pid,p.name pname,p.icon picon,p.number,p.position,p.birth,p.age,p.height,p.arm_exhibition,p.weight,p.standing_reach,p.nationality,p.wages,p.introduce,
+      t.team_id,t.name tname,t.icon ticon
+      from player_average_data d,player_info p,team_info t
+      where d.player_id=#{playerInfo.id} and
+      d.season_number=#{seasonNumber} and
+      d.season_classification=#{seasonClassification} and
+      d.player_id=p.id and
+      d.team_id=t.team_id
+    </select>
+
+    <select id="selectPlayerAverageDataIfExit" parameterType="com.xiazhuoxian.bbs.pojo.PlayerAverageData" resultMap="PlayerAverageData">
+        select * from player_average_data
+        where player_id=#{playerInfo.id} and season_number=#{seasonNumber} and season_classification=#{seasonClassification}
+    </select>
+
+    <select id="selectTheLastPlayerAverageData" parameterType="com.xiazhuoxian.bbs.pojo.PlayerAverageData" resultMap="PlayerAverageData">
+      select d.*,
+      p.id pid,p.name pname,p.icon picon,p.number,p.position,p.birth,p.age,p.height,p.arm_exhibition,p.weight,p.standing_reach,p.nationality,p.wages,p.introduce,
+      t.team_id,t.name tname,t.icon ticon
+      from player_average_data d,player_info p,team_info t
+      where d.player_id=#{playerInfo.id} and
+            d.season_classification=#{seasonClassification} and
+            d.player_id=p.id and
+            d.team_id=t.team_id
+      order by d.season_number desc
+      limit 1
+    </select>
+
+    <select id="selectAllPlayerAverageData" parameterType="com.xiazhuoxian.bbs.pojo.PlayerAverageData" resultMap="PlayerAverageData">
+      select d.*,
+      p.id pid,p.name pname,p.icon picon,p.number,p.position,p.birth,p.age,p.height,p.arm_exhibition,p.weight,p.standing_reach,p.nationality,p.wages,p.introduce,
+      t.team_id,t.name tname,t.icon ticon
+      from player_average_data d,player_info p,team_info t
+      where d.player_id=#{playerInfo.id} and
+            d.season_classification=#{seasonClassification} and
+            d.player_id=p.id and
+            d.team_id=t.team_id
+      order by d.season_number
+    </select>
+
+    <select id="selectTheLastTenPlayerSingleMatchDataByPlayerId" parameterType="int" resultMap="PlayerSingleMatchData">
+        select d.*,i.id pid,i.name,i.icon,t.team_id,t.name teamName,
+              m.id mid,m.season_number,m.season_classification,m.match_date,m.home_team_id,m.away_team_id,m.home_team_score,m.away_team_score,
+              ht.team_id h_team_id,ht.name h_name,ht.icon h_icon,
+              at.team_id a_team_id,at.name a_name,at.icon a_icon
+        from (player_single_match_data d,player_info i,team_info t,match_schedule m)
+        left join team_info ht on m.home_team_id=ht.team_id
+        left join team_info at on m.away_team_id=at.team_id
+        where d.player_id=#{playerId} and
+              d.player_id=i.id and
+              i.team_id=t.team_id and
+              m.id=d.match_id
+        order by m.match_date desc
+        limit 0,10
+    </select>
+
+</mapper>

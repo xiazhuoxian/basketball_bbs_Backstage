@@ -1,0 +1,387 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xiazhuoxian.bbs.mapper.MessageMapper" >
+
+    <resultMap id="Message" type="com.xiazhuoxian.bbs.pojo.Message">
+        <id property="id" column="id"/>
+        <result property="senderIdentity" column="sender_identity"/>
+        <result property="receiverIdentity" column="receiver_identity"/>
+        <result property="messageType" column="message_type"/>
+        <result property="contentType" column="content_type"/>
+        <result property="content" column="content"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="readingState" column="reading_state"/>
+        <result property="senderRecord" column="sender_record"/>
+        <result property="receiverRecord" column="receiver_record"/>
+        <association property="userSender" javaType="com.xiazhuoxian.bbs.pojo.UserInfo">
+            <id property="userId" column="u_s_user_id"/>
+            <result property="nickname" column="u_s_nickname"/>
+            <result property="icon" column="u_s_icon"/>
+        </association>
+        <association property="adminSender" javaType="com.xiazhuoxian.bbs.pojo.AdminInfo">
+            <id property="adminId" column="a_s_admin_id"/>
+            <result property="nickname" column="a_s_nickname"/>
+            <result property="icon" column="a_s_icon"/>
+        </association>
+        <association property="userReceiver" javaType="com.xiazhuoxian.bbs.pojo.UserInfo">
+            <id property="userId" column="u_r_user_id"/>
+            <result property="nickname" column="u_r_nickname"/>
+            <result property="icon" column="u_r_icon"/>
+        </association>
+        <association property="adminRecriver" javaType="com.xiazhuoxian.bbs.pojo.AdminInfo">
+            <id property="adminId" column="a_r_admin_id"/>
+            <result property="nickname" column="a_r_nickname"/>
+            <result property="icon" column="a_r_icon"/>
+        </association>
+        <association property="comments" javaType="com.xiazhuoxian.bbs.pojo.MainPostsComments">
+            <id column="main_posts_comments_id" property="mainPostsCommentsId"/>
+            <result column="parent_comment_id" property="parentCommentId"/>
+            <result column="head_comment_id" property="headCommentId"/>
+            <result column="comments_content" property="content"/>
+            <result column="comments_update_time" property="updateTime"/>
+            <association property="mainPosts" javaType="com.xiazhuoxian.bbs.pojo.MainPosts">
+                <id property="mainPostsId" column="main_posts_id"/>
+                <result property="title" column="title"/>
+            </association>
+        </association>
+    </resultMap>
+    
+    <resultMap id="DialogueList" type="com.xiazhuoxian.bbs.pojo.DialogueList">
+        <id column="id" property="id"/>
+        <result column="subject_identity" property="subjectIdentity"/>
+        <result column="target_identity" property="targetIdentity"/>
+        <result column="reading_state" property="readingState"/>
+        <result column="update_time" property="updateTime"/>
+        <association property="subjectUser" javaType="com.xiazhuoxian.bbs.pojo.UserInfo">
+            <id property="userId" column="s_u_user_id"/>
+            <result property="nickname" column="s_u_nickname"/>
+            <result property="icon" column="s_u_icon"/>
+        </association>
+        <association property="subjectAdmin" javaType="com.xiazhuoxian.bbs.pojo.AdminInfo">
+            <id property="adminId" column="s_a_admin_id"/>
+            <result property="nickname" column="s_a_nickname"/>
+            <result property="icon" column="s_a_icon"/>
+        </association>
+        <association property="targetUser" javaType="com.xiazhuoxian.bbs.pojo.UserInfo">
+            <id property="userId" column="t_u_user_id"/>
+            <result property="nickname" column="t_u_nickname"/>
+            <result property="icon" column="t_u_icon"/>
+        </association>
+        <association property="targetAdmin" javaType="com.xiazhuoxian.bbs.pojo.AdminInfo">
+            <id property="adminId" column="t_a_admin_id"/>
+            <result property="nickname" column="t_a_nickname"/>
+            <result property="icon" column="t_a_icon"/>
+        </association>
+    </resultMap>
+
+    <insert id="insertMessage" parameterType="com.xiazhuoxian.bbs.pojo.Message">
+      insert into message
+      (id,sender_id,sender_identity,receiver_id,receiver_identity,message_type,content_type,comment_id,content,update_time,reading_state,sender_record,receiver_record)
+      values (
+      #{id},
+        <if test="senderIdentity.toString()=='USER'">
+            #{userSender.userId},
+        </if>
+        <if test="senderIdentity.toString()=='ADMIN'">
+            #{adminSender.adminId},
+        </if>
+      #{senderIdentity},
+        <if test="receiverIdentity.toString()=='USER'">
+            #{userReceiver.userId},
+        </if>
+        <if test="receiverIdentity.toString()=='ADMIN'">
+            #{adminRecriver.adminId},
+        </if>
+        #{receiverIdentity},#{messageType},#{contentType},#{comments.mainPostsCommentsId},#{content},#{updateTime},#{readingState},#{senderRecord},#{senderRecord}
+      )
+    </insert>
+    
+    <delete id="deleteMessageById" parameterType="int">
+        delete from message where id=#{id}
+    </delete>
+    
+    <update id="updateMessageReadingState" parameterType="int">
+        update message set reading_state=true where id=#{id}
+    </update>
+
+    <update id="clearUnread" parameterType="com.xiazhuoxian.bbs.pojo.Message">
+        update message set reading_state=true where message_type=#{messageType}
+        <if test="receiverIdentity.toString()=='USER'">
+            and receiver_id=#{userReceiver.userId}
+            and receiver_identity=#{receiverIdentity}
+        </if>
+        <if test="receiverIdentity.toString()=='ADMIN'">
+            and receiver_id=#{adminRecriver.adminId}
+            and receiver_identity=#{receiverIdentity}
+        </if>
+    </update>
+    
+    <update id="selectDialogueMessageAndSetMessagerAlreadyread" parameterType="com.xiazhuoxian.bbs.pojo.Message">
+        update message m set m.reading_state=true
+        where
+        m.message_type=#{messageType} and
+        <if test="receiverIdentity.toString()=='USER' and senderIdentity.toString()=='USER'">
+            ((m.receiver_id=#{userReceiver.userId} and m.receiver_identity=#{receiverIdentity} and
+            m.sender_id=#{userSender.userId} and m.sender_identity=#{senderIdentity})
+            or
+            (m.sender_id=#{userReceiver.userId} and m.sender_identity=#{receiverIdentity} and
+            m.receiver_id=#{userSender.userId} and m.receiver_identity=#{senderIdentity}))
+        </if>
+        <if test="receiverIdentity.toString()=='USER' and senderIdentity.toString()=='ADMIN'">
+            ((m.receiver_id=#{userReceiver.userId} and m.receiver_identity=#{receiverIdentity} and
+            m.sender_id=#{adminSender.adminId} and m.sender_identity=#{senderIdentity})
+            or
+            (m.sender_id=#{userReceiver.userId} and m.sender_identity=#{receiverIdentity} and
+            m.receiver_id=#{adminSender.adminId} and m.receiver_identity=#{senderIdentity}))
+        </if>
+        <if test="receiverIdentity.toString()=='ADMIN' and senderIdentity.toString()=='USER'">
+            ((m.receiver_id=#{adminRecriver.adminId} and m.receiver_identity=#{receiverIdentity} and
+            m.sender_id=#{userSender.userId} and m.sender_identity=#{senderIdentity})
+            or
+            (m.sender_id=#{adminRecriver.adminId} and m.sender_identity=#{receiverIdentity} and
+            m.receiver_id=#{userSender.userId} and m.receiver_identity=#{senderIdentity}))
+        </if>
+        <if test="receiverIdentity.toString()=='ADMIN' and senderIdentity.toString()=='ADMIN'">
+            ((m.receiver_id=#{adminRecriver.adminId} and m.receiver_identity=#{receiverIdentity} and
+            m.sender_id=#{adminSender.adminId} and m.sender_identity=#{senderIdentity})
+            or
+            (m.sender_id=#{adminRecriver.adminId} and m.sender_identity=#{receiverIdentity} and
+            m.receiver_id=#{adminSender.adminId} and m.receiver_identity=#{senderIdentity}))
+        </if>
+    </update>
+
+    <select id="selectAllMessageByMessageType" resultMap="Message">
+        <bind name="firstItem" value="(paging.currentPageNumber-1)*paging.itemsDisplayedPerPage"></bind>
+        select
+        m.id,m.sender_id,m.sender_identity,m.receiver_id,m.receiver_identity,
+        m.message_type,m.content_type,m.comment_id,m.content,m.update_time,m.reading_state,
+        us.user_id u_s_user_id,us.nickname u_s_nickname,us.icon u_s_icon,
+        ass.admin_id a_s_admin_id,ass.nickname a_s_nickname,ass.icon a_s_icon,
+        ur.user_id u_r_user_id,ur.nickname u_r_nickname,ur.icon u_r_icon,
+        ar.admin_id a_r_admin_id,ar.nickname a_r_nickname,ar.icon a_r_icon,
+        mpc.main_posts_comments_id,mpc.parent_comment_id,mpc.head_comment_id,
+        mpc.content comments_content,mpc.update_time comments_update_time,
+        mp.main_posts_id,mp.title
+        from message m
+        left join main_posts_comments mpc on m.comment_id=mpc.main_posts_comments_id
+        left join main_posts mp on mpc.mainposts_id=mp.main_posts_id
+        left join user_info us on m.sender_identity=us.identity and m.sender_id=us.user_id
+        left join admin_info ass on m.sender_identity=ass.identity and m.sender_id=ass.admin_id
+        left join user_info ur on m.receiver_identity=ur.identity and m.receiver_id=ur.user_id
+        left join admin_info ar on m.receiver_identity=ar.identity and m.receiver_id=ar.admin_id
+        where
+        m.message_type=#{message.messageType}
+        and m.receiver_record=true
+        <if test="message.receiverIdentity.toString()=='USER'">
+           and m.receiver_id=#{message.userReceiver.userId}
+            and m.receiver_identity=#{message.receiverIdentity}
+        </if>
+        <if test="message.receiverIdentity.toString()=='ADMIN'">
+            and m.receiver_id=#{message.adminRecriver.adminId}
+            and m.receiver_identity=#{message.receiverIdentity}
+        </if>
+        order by m.update_time desc
+        limit #{firstItem},#{paging.itemsDisplayedPerPage}
+    </select>
+
+    <select id="selectUnreadMessage" resultMap="Message">
+        select
+        m.id,m.sender_id,m.sender_identity,m.receiver_id,m.receiver_identity,
+        m.message_type,m.content_type,m.comment_id,m.content,m.update_time,m.reading_state,
+        us.user_id u_s_user_id,us.nickname u_s_nickname,us.icon u_s_icon,
+        ass.admin_id a_s_admin_id,ass.nickname a_s_nickname,ass.icon a_s_icon,
+        ur.user_id u_r_user_id,ur.nickname u_r_nickname,ur.icon u_r_icon,
+        ar.admin_id a_r_admin_id,ar.nickname a_r_nickname,ar.icon a_r_icon,
+        mpc.main_posts_comments_id,mpc.parent_comment_id,mpc.head_comment_id,
+        mpc.content comments_content,mpc.update_time comments_update_time,
+        mp.main_posts_id,mp.title
+        from message m
+        left join main_posts_comments mpc on m.comment_id=mpc.main_posts_comments_id
+        left join main_posts mp on mpc.mainposts_id=mp.main_posts_id
+        left join user_info us on m.sender_identity=us.identity and m.sender_id=us.user_id
+        left join admin_info ass on m.sender_identity=ass.identity and m.sender_id=ass.admin_id
+        left join user_info ur on m.receiver_identity=ur.identity and m.receiver_id=ur.user_id
+        left join admin_info ar on m.receiver_identity=ar.identity and m.receiver_id=ar.admin_id
+        where
+        <if test="messageType!=null and messageType.toString()!=''">
+             m.message_type=#{messageType} and
+        </if>
+        <if test="receiverIdentity!=null and receiverIdentity.toString()=='USER'">
+             m.receiver_id=#{userReceiver.userId} and
+             m.receiver_identity=#{receiverIdentity} and
+        </if>
+        <if test="receiverIdentity!=null and receiverIdentity.toString()=='ADMIN'">
+             m.receiver_id=#{adminRecriver.adminId} and
+             m.receiver_identity=#{receiverIdentity} and
+        </if>
+         m.reading_state=false
+        order by m.update_time desc
+    </select>
+
+    <select id="selectDialogueMessage" resultMap="Message" parameterType="com.xiazhuoxian.bbs.pojo.Message">
+        select
+        m.id,m.sender_id,m.sender_identity,m.receiver_id,m.receiver_identity,
+        m.message_type,m.content_type,m.comment_id,m.content,m.update_time,m.reading_state,
+        us.user_id u_s_user_id,us.nickname u_s_nickname,us.icon u_s_icon,
+        ass.admin_id a_s_admin_id,ass.nickname a_s_nickname,ass.icon a_s_icon,
+        ur.user_id u_r_user_id,ur.nickname u_r_nickname,ur.icon u_r_icon,
+        ar.admin_id a_r_admin_id,ar.nickname a_r_nickname,ar.icon a_r_icon,
+        mpc.main_posts_comments_id,mpc.parent_comment_id,mpc.head_comment_id,
+        mpc.content comments_content,mpc.update_time comments_update_time,
+        mp.main_posts_id,mp.title
+        from message m
+        left join main_posts_comments mpc on m.comment_id=mpc.main_posts_comments_id
+        left join main_posts mp on mpc.mainposts_id=mp.main_posts_id
+        left join user_info us on m.sender_identity=us.identity and m.sender_id=us.user_id
+        left join admin_info ass on m.sender_identity=ass.identity and m.sender_id=ass.admin_id
+        left join user_info ur on m.receiver_identity=ur.identity and m.receiver_id=ur.user_id
+        left join admin_info ar on m.receiver_identity=ar.identity and m.receiver_id=ar.admin_id
+        where
+        <if test="messageType!=null and messageType.toString()!=''">
+            m.message_type=#{messageType} and
+        </if>
+        <if test="receiverIdentity.toString()=='USER' and senderIdentity.toString()=='USER'">
+            ((m.receiver_id=#{userReceiver.userId} and m.receiver_identity=#{receiverIdentity} and
+            m.sender_id=#{userSender.userId} and m.sender_identity=#{senderIdentity})
+            or
+            (m.sender_id=#{userReceiver.userId} and m.sender_identity=#{receiverIdentity} and
+            m.receiver_id=#{userSender.userId} and m.receiver_identity=#{senderIdentity}))
+        </if>
+        <if test="receiverIdentity.toString()=='USER' and senderIdentity.toString()=='ADMIN'">
+            ((m.receiver_id=#{userReceiver.userId} and m.receiver_identity=#{receiverIdentity} and
+            m.sender_id=#{adminSender.adminId} and m.sender_identity=#{senderIdentity})
+            or
+            (m.sender_id=#{userReceiver.userId} and m.sender_identity=#{receiverIdentity} and
+            m.receiver_id=#{adminSender.adminId} and m.receiver_identity=#{senderIdentity}))
+        </if>
+        <if test="receiverIdentity.toString()=='ADMIN' and senderIdentity.toString()=='USER'">
+            ((m.receiver_id=#{adminRecriver.adminId} and m.receiver_identity=#{receiverIdentity} and
+            m.sender_id=#{userSender.userId} and m.sender_identity=#{senderIdentity})
+            or
+            (m.sender_id=#{adminRecriver.adminId} and m.sender_identity=#{receiverIdentity} and
+            m.receiver_id=#{userSender.userId} and m.receiver_identity=#{senderIdentity}))
+        </if>
+        <if test="receiverIdentity.toString()=='ADMIN' and senderIdentity.toString()=='ADMIN'">
+            ((m.receiver_id=#{adminRecriver.adminId} and m.receiver_identity=#{receiverIdentity} and
+            m.sender_id=#{adminSender.adminId} and m.sender_identity=#{senderIdentity})
+            or
+            (m.sender_id=#{adminRecriver.adminId} and m.sender_identity=#{receiverIdentity} and
+            m.receiver_id=#{adminSender.adminId} and m.receiver_identity=#{senderIdentity}))
+        </if>
+        order by m.update_time
+    </select>
+
+    <insert id="insertDialogueList" parameterType="com.xiazhuoxian.bbs.pojo.DialogueList">
+        insert into dialogue_list
+        (subject_id,subject_identity,target_id,target_identity,reading_state,update_time)
+        values (
+        <if test="subjectIdentity.toString()=='USER'">
+            #{subjectUser.userId},
+        </if>
+        <if test="subjectIdentity.toString()=='ADMIN'">
+            #{subjectAdmin.adminId},
+        </if>
+        #{subjectIdentity},
+        <if test="targetIdentity.toString()=='USER'">
+            #{targetUser.userId},
+        </if>
+        <if test="targetIdentity.toString()=='ADMIN'">
+            #{targetAdmin.adminId},
+        </if>
+        #{targetIdentity},#{readingState},#{updateTime}
+        )
+    </insert>
+
+    <delete id="deleteDialogueListById" parameterType="int">
+        delete from dialogue_list where id=#{id}
+    </delete>
+
+    <update id="updateDiaLogueListUpdateTime" parameterType="com.xiazhuoxian.bbs.pojo.DialogueList">
+        update dialogue_list set update_time=#{updateTime}
+        <if test="readingState!=null">
+            ,reading_state=#{readingState}
+        </if>
+        where
+        <if test="subjectIdentity!=null and subjectIdentity.toString()=='USER'">
+            subject_id=#{subjectUser.userId} and
+            subject_identity=#{subjectIdentity} and
+        </if>
+        <if test="subjectIdentity!=null and subjectIdentity.toString()=='ADMIN'">
+            subject_id=#{subjectAdmin.adminId} and
+            subject_identity=#{subjectIdentity} and
+        </if>
+        <if test="targetIdentity!=null and targetIdentity.toString()=='USER'">
+            target_id=#{targetUser.userId} and
+            target_identity=#{targetIdentity}
+        </if>
+        <if test="targetIdentity!=null and targetIdentity.toString()=='ADMIN'">
+            target_id=#{targetAdmin.adminId} and
+            target_identity=#{targetIdentity}
+        </if>
+    </update>
+
+    <update id="selectDialogueMessageAndSetDialogueAlreadyread" parameterType="com.xiazhuoxian.bbs.pojo.DialogueList">
+        update dialogue_list set reading_state=true
+        where
+        <if test="subjectIdentity!=null and subjectIdentity.toString()=='USER'">
+            subject_id=#{subjectUser.userId} and
+            subject_identity=#{subjectIdentity} and
+        </if>
+        <if test="subjectIdentity!=null and subjectIdentity.toString()=='ADMIN'">
+            subject_id=#{subjectAdmin.adminId} and
+            subject_identity=#{subjectIdentity} and
+        </if>
+        <if test="targetIdentity!=null and targetIdentity.toString()=='USER'">
+            target_id=#{targetUser.userId} and
+            target_identity=#{targetIdentity}
+        </if>
+        <if test="targetIdentity!=null and targetIdentity.toString()=='ADMIN'">
+            target_id=#{targetAdmin.adminId} and
+            target_identity=#{targetIdentity}
+        </if>
+    </update>
+
+    <select id="selectDialogueListIfExit" parameterType="com.xiazhuoxian.bbs.pojo.DialogueList" resultType="int">
+        select count(id) from dialogue_list where
+        <if test="subjectIdentity!=null and subjectIdentity.toString()=='USER'">
+            subject_id=#{subjectUser.userId} and
+            subject_identity=#{subjectIdentity} and
+        </if>
+        <if test="subjectIdentity!=null and subjectIdentity.toString()=='ADMIN'">
+            subject_id=#{subjectAdmin.adminId} and
+            subject_identity=#{subjectIdentity} and
+        </if>
+        <if test="targetIdentity!=null and targetIdentity.toString()=='USER'">
+            target_id=#{targetUser.userId} and
+            target_identity=#{targetIdentity}
+        </if>
+        <if test="targetIdentity!=null and targetIdentity.toString()=='ADMIN'">
+            target_id=#{targetAdmin.adminId} and
+            target_identity=#{targetIdentity}
+        </if>
+    </select>
+    
+    <select id="selectDialogueListBySubjectId" resultMap="DialogueList">
+        select
+        d.id,d.subject_id,d.subject_identity,d.target_id,d.target_identity,d.reading_state,d.update_time,
+        su.user_id s_u_user_id,su.nickname s_u_nickname,su.icon s_u_icon,
+        sa.admin_id s_a_admin_id,sa.nickname s_a_nickname,sa.icon s_a_icon,
+        tu.user_id t_u_user_id,tu.nickname t_u_nickname,tu.icon t_u_icon,
+        ta.admin_id t_a_admin_id,ta.nickname t_a_nickname,ta.icon t_a_icon
+        from dialogue_list d
+        left join user_info su on d.subject_identity=su.identity and d.subject_id=su.user_id
+        left join admin_info sa on d.subject_identity=sa.identity and d.subject_id=sa.admin_id
+        left join user_info tu on d.target_identity=tu.identity and d.target_id=tu.user_id
+        left join admin_info ta on d.target_identity=ta.identity and d.target_id=ta.admin_id
+        where
+        <if test="subjectIdentity!=null and subjectIdentity.toString()=='USER'">
+            d.subject_id=#{subjectUser.userId} and
+            d.subject_identity=#{subjectIdentity}
+        </if>
+        <if test="subjectIdentity!=null and subjectIdentity.toString()=='ADMIN'">
+            d.subject_id=#{subjectAdmin.adminId} and
+            d.subject_identity=#{subjectIdentity}
+        </if>
+        order by d.update_time desc
+    </select>
+</mapper>
